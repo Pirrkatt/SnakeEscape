@@ -3,3 +3,8 @@ Collisions
 Menu screen
 Level Complete message
 Sounds
+Goal Texture Photoshop
+Start Texture Photoshop
+
+Difficulty Slider
+Mute Music Button
