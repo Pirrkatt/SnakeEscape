@@ -6,5 +6,10 @@ Sounds
 Goal Texture Photoshop
 Start Texture Photoshop
 
-Difficulty Slider
-Mute Music Button
+Difficulty/Volume Slider
+Remove Menu Map while playing etc?
+Rework Gamestates
+Rework Buttons to oop
+Get fun cursor
+
+Remove auto start game when clicking play

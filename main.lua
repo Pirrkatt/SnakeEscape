@@ -1,7 +1,10 @@
 require("randomFunctions")
 require("loadMap")
 
-local currentDirection = nil
+GAME_WIDTH, GAME_HEIGHT = love.graphics.getWidth(), love.graphics.getHeight()
+PLAYER_WIDTH, PLAYER_HEIGHT = 42, 42
+
+CURRENT_DIRECTION = ""
 
 function love.load()
     anim8 = require 'libraries/anim8'
@@ -9,8 +12,8 @@ function love.load()
     -- love.graphics.setDefaultFilter("nearest", "nearest") -- Disable Blur on scaling
 
     player = {}
-    player.spriteSheet = love.graphics.newImage('sprites/snake-sheet.png')
-    player.grid = anim8.newGrid(42, 42, player.spriteSheet:getWidth(), player.spriteSheet:getHeight())
+    player.spriteSheet = love.graphics.newImage('assets/sprites/snake-sheet.png')
+    player.grid = anim8.newGrid(PLAYER_WIDTH, PLAYER_HEIGHT, player.spriteSheet:getWidth(), player.spriteSheet:getHeight())
 
     player.animations = {}
     player.animations.down = anim8.newAnimation( player.grid('1-3', 1), 0.2 )
@@ -20,122 +23,120 @@ function love.load()
 
     player.anim = player.animations.right -- Default Direction
 
-    player.speed = 1
+    player.speed = 3
 
-    menuScreen = true
-    menuImage = love.graphics.newImage('sprites/mainMenuTEMPORARY.png')
-    imgWidth = menuImage:getWidth()
-    imgHeight = menuImage:getHeight()
-    scaleX = love.graphics.getWidth() / imgWidth
-    scaleY = love.graphics.getHeight() / imgHeight
-    local font = love.graphics.newFont(30)
-    menuTexts = {
-        play = {text = love.graphics.newText(font, "PLAY"), x = 365, y = 315},
-        levelSelect = {text = love.graphics.newText(font, "SELECT LEVEL"), x = 295, y = 375},
-        quit = {text = love.graphics.newText(font, "QUIT"), x = 365, y = 435}
+    GAMESTATE = 'MENU_SCREEN'
+
+    menu_image = love.graphics.newImage('assets/sprites/mainMenuTEMPORARY.png')
+    menu_width = menu_image:getWidth()
+    menu_height = menu_image:getHeight()
+    scaleX = GAME_WIDTH / menu_width
+    scaleY = GAME_HEIGHT / menu_height
+    font = love.graphics.newFont(30)
+    menu_texts = {
+        play = {text = "PLAY", y = 315},
+        level = {text = "SELECT LEVEL", y = 375},
+        quit = {text = "QUIT", y = 435}
+    }
+
+    music_track = love.audio.newSource("assets/sounds/background_music.wav", "stream")
+    music_track:setVolume(0.1)
+    -- music_track:setPitch(0.8)
+    VOLUME_ENABLED = false
+    volume_image = love.graphics.newImage('assets/sprites/volumeButtons.png')
+    vol_width, vol_height = 176, 178
+    vol_cord_x, vol_cord_y = 400, 600
+    volume_buttons = {}
+    for i = 1, 4 do
+        volume_buttons[i] = love.graphics.newQuad(vol_width * (i - 1), 0, vol_width, vol_height, volume_image:getWidth(), volume_image:getHeight())
+    end
+    drawMainMenu()
+
+    game_over_image = love.graphics.newImage('assets/sprites/gameOverTemporary.png')
+    game_over_width = game_over_image:getWidth()
+    game_over_height = game_over_image:getHeight()
+    game_over_scaleX = GAME_WIDTH / game_over_width
+    game_over_scaleY = GAME_HEIGHT / game_over_height
+    -- local font = love.graphics.newFont(30)
+    game_over_text = {
+        gameOver = {text = "GAME OVER", y = 100},
+        playAgain = {text = "PLAY AGAIN", y = 620},
+        mainMenu = {text = "MAIN MENU", y = 720},
     }
 end
 
-local function playerMove(dir)
-    if dir == "up" then
-        if player.y <= (0 - 10) then
-            return
-        end
-        player.y = player.y - player.speed
-    elseif dir == "right" then
-        if player.x >= (love.graphics.getHeight() - 30) then
-            return
-        end
-        player.x = player.x + player.speed
-    elseif dir == "down" then
-        if player.y >= (love.graphics.getHeight() - 30) then
-            return
-        end
-        player.y = player.y + player.speed
-    elseif dir == "left" then
-        if player.x <= (0 - 10) then
-            return
-        end
-        player.x = player.x - player.speed
-    end
-end
+local mousePos = nil
+local timer = 0
 
 function love.update(dt)
-    local hoverText = false
-    local handCursor = love.mouse.getSystemCursor("hand")
-    if (menuScreen) then
-        local mouseX, mouseY = love.mouse.getPosition()
-        for k in pairs(menuTexts) do
-            if (mouseX >= menuTexts[k].x) and (mouseX <= menuTexts[k].x + menuTexts[k].text:getWidth()) and
-                (mouseY >= menuTexts[k].y) and (mouseY <= menuTexts[k].y + menuTexts[k].text:getHeight()) then
-                hoverText = true
-            end
+    if (VOLUME_ENABLED) then
+        if not music_track:isPlaying( ) then
+            love.audio.play(music_track)
         end
-    end
-
-    if (hoverText) then
-        love.mouse.setCursor(handCursor)
     else
-        love.mouse.setCursor()
+        love.audio.stop()
+    end
+    -- timer = timer + dt
+    -- if timer >= 1 then
+    --     print(player.x .. " " .. player.y)
+        -- if mousePos ~= love.mouse.getPosition() then
+        --     print(love.mouse.getPosition())
+        --     mousePos = love.mouse.getPosition()
+        -- end
+    --     timer = 0
+    -- end
+
+    if (GAMESTATE == 'MENU_SCREEN') then
+        hoverTextCursor(menu_texts)
     end
 
-    if (playingLevel) then
-        if currentDirection ~= nil then
-            playerMove(currentDirection)
+    if (GAMESTATE == 'PLAYING_LEVEL') then
+        if CURRENT_DIRECTION ~= "" then
+            checkCollision(CURRENT_DIRECTION)
+            checkFinish()
+            playerMove(CURRENT_DIRECTION)
         else
             player.anim:gotoFrame(2)
         end
-
-        if love.keyboard.isDown("up") then
-            currentDirection = "up"
-            player.anim = player.animations.up
-        elseif love.keyboard.isDown("right") then
-            currentDirection = "right"
-            player.anim = player.animations.right
-        elseif love.keyboard.isDown("down") then
-            currentDirection = "down"
-            player.anim = player.animations.down
-        elseif love.keyboard.isDown("left") then
-            currentDirection = "left"
-            player.anim = player.animations.left
-        elseif love.keyboard.isDown("escape") then -- Pauses
-            currentDirection = nil
-        elseif love.keyboard.isDown("x") then -- Quits Game
-            love.event.quit()
-        end
+        sendKeyboardInputs()
     end
     player.anim:update(dt)
 end
 
 function love.draw()
-    if (playingLevel) then
+    if (GAMESTATE == 'LEVEL_FINISHED') then -- show gz message, wait 5 seconds, start next level if exists in maps folder
         gameMap:draw(0, 0, scaleX, scaleY)
-        player.anim:draw(player.spriteSheet, player.x, player.y)
-    elseif (menuScreen) then
-        love.graphics.draw(menuImage, 0, 0, 0, scaleX, scaleY)
-        for k in pairs(menuTexts) do
-            love.graphics.draw(menuTexts[k].text, menuTexts[k].x, menuTexts[k].y)
-        end
+        sendBalloons()
+        -- love.graphics.setColor(0, 0, 0, 100)
+        -- love.graphics.rectangle('fill', 0,0, GAME_WIDTH, GAME_HEIGHT)
+        -- love.graphics.setColor(255,255,255)
+        love.graphics.printf('WELL DONE!', 0, GAME_HEIGHT/2, GAME_WIDTH, 'center', 0, 1.2, 1.2)
+    end
+    if (GAMESTATE == 'PLAYING_LEVEL') then
+        gameMap:draw(0, 0, scaleX, scaleY)
+        player.anim:draw(player.spriteSheet, player.x, player.y, 0, 1, 1, PLAYER_WIDTH / 2, PLAYER_HEIGHT / 2)
+    elseif (GAMESTATE == 'MENU_SCREEN') then
+        drawMainMenu()
+    elseif (GAMESTATE == 'GAME_OVER') then -- show fail screen, try again/mainmenu buttons (with currentLevel)
+        drawGameOver()
     end
 end
 
 function love.mousepressed(x, y, button, istouch)
-    if (menuScreen) then
-        for k in pairs(menuTexts) do
-            if (x >= menuTexts[k].x) and (x <= menuTexts[k].x + menuTexts[k].text:getWidth()) and
-            (y >= menuTexts[k].y) and (y <= menuTexts[k].y + menuTexts[k].text:getHeight()) then
-                if button == 1 then
-                    if k == 'play' then
-                        loadMap(1)
-                        playingLevel = true
-                    elseif k == 'levelSelect' then
-                        print('Select Level')
-                    elseif k == 'quit' then
-                        love.event.quit()
-                    end
-                    return
-                end
-            end
+    if (GAMESTATE == 'MENU_SCREEN') then
+        if button == 1 then
+            menuButtons(x, y, button)
+            love.mouse.setCursor()
         end
     end
 end
+
+-- timePassed = 0
+-- timeToPass = 10
+-- function love.update(dt)
+--  timePassed = timePassed + 1 * dt
+
+--  if timePassed > timeToPass then
+--   timePassed = 0
+--   -- do something here
+-- end

@@ -4,5 +4,5 @@ function love.conf(t)
     t.window.height = 800
 
     t.window.title = "Labyrinth Snake"
-    t.window.icon = 'sprites/icon.png'
+    t.window.icon = 'assets/sprites/icon.png'
 end

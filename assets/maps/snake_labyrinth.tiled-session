@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "mainMenu.tmx",
+    "activeFile": "Level1.tmx",
     "expandedProjectPaths": [
         "."
     ],
@@ -16,11 +16,11 @@
             "scaleInDock": 1
         },
         "Level1.tmx": {
-            "scale": 2,
-            "selectedLayer": 2,
+            "scale": 1.5,
+            "selectedLayer": 4,
             "viewCenter": {
-                "x": 328.75,
-                "y": 259.5
+                "x": 252.33333333333331,
+                "y": 232.66666666666663
             }
         },
         "Level1.tmx#tiles": {
@@ -30,15 +30,15 @@
             "scale": 1.78125,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 250.66666666666669,
-                "y": 240.84210526315786
+                "x": 239.99999999999994,
+                "y": 240.28070175438594
             }
         },
         "mainMenu.tmx#mainMenu": {
             "scaleInDock": 1
         }
     },
-    "last.exportedFilePath": "C:/Users/Danne/Desktop/SnakeLabyrinthGame/maps",
+    "last.exportedFilePath": "C:/Users/Danne/Desktop/SnakeLabyrinthGame/assets/maps",
     "last.imagePath": "C:/Users/Danne/Desktop/SnakeLabyrinthGame/sprites",
     "map.height": 30,
     "map.lastUsedExportFilter": "Lua-filer (*.lua)",
@@ -52,8 +52,8 @@
     ],
     "project": "snake_labyrinth.tiled-project",
     "recentFiles": [
-        "Level1.tmx",
-        "mainMenu.tmx"
+        "mainMenu.tmx",
+        "Level1.tmx"
     ],
     "tileset.embedInMap": true,
     "tileset.tileSize": {
