@@ -1,15 +1,17 @@
-Add starting position for each level
-Collisions
 Menu screen
-Level Complete message
-Sounds
-Goal Texture Photoshop
-Start Texture Photoshop
+Level Complete message - Show difficulty on game complete screen
 
 Difficulty/Volume Slider
-Remove Menu Map while playing etc?
-Rework Gamestates
-Rework Buttons to oop
-Get fun cursor
+Rework Gamestates ( Gamestate.menu.menu, Gamestate.menu.lvlselect, Gamestate.menu.settings, Gamestate.playing.play, Gamestate.play.pause, Gamestate.play.win, Gamestate.play.lose)
+Save state to local machine - Save settings, stars on each map, maps unlocked, characters unlocked
+Snake body following
+Add special coins (colored) for unlocking new characters
+Make map with spikes
+
+
+
 
 Remove auto start game when clicking play
+Rework Buttons to inherit and make subclasses?
+How to inherit buttons from Button
+How to skip parameters

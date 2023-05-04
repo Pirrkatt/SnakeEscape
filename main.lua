@@ -1,16 +1,15 @@
-require("randomFunctions")
-require("loadMap")
-
-GAME_WIDTH, GAME_HEIGHT = love.graphics.getWidth(), love.graphics.getHeight()
-PLAYER_WIDTH, PLAYER_HEIGHT = 42, 42
-
-CURRENT_DIRECTION = ""
+require 'global'
+require 'core'
+require 'utilities'
+require 'buttonSetup'
+require 'loadMap'
 
 function love.load()
     anim8 = require 'libraries/anim8'
     sti = require 'libraries/sti'
     -- love.graphics.setDefaultFilter("nearest", "nearest") -- Disable Blur on scaling
 
+    -- PLAYER
     player = {}
     player.spriteSheet = love.graphics.newImage('assets/sprites/snake-sheet.png')
     player.grid = anim8.newGrid(PLAYER_WIDTH, PLAYER_HEIGHT, player.spriteSheet:getWidth(), player.spriteSheet:getHeight())
@@ -21,122 +20,159 @@ function love.load()
     player.animations.right = anim8.newAnimation( player.grid('1-3', 3), 0.2 )
     player.animations.up = anim8.newAnimation( player.grid('1-3', 4), 0.2 )
 
-    player.anim = player.animations.right -- Default Direction
+    -- player.anim = nil -- Default Direction
 
-    player.speed = 3
+    player.speed = 5 -- Default speed = 2 (Medium Difficulty)
+    
+    balloons = {} -- Holds all balloon objects (from core.lua CheckFinish)
 
-    GAMESTATE = 'MENU_SCREEN'
+    -- GOLD COIN
+    gold_coin_img = love.graphics.newImage('assets/sprites/coin_gold.png')
+    gold_coin_grid = anim8.newGrid(32, 32, gold_coin_img:getWidth(), gold_coin_img:getHeight())
+    gold_coin_anim = anim8.newAnimation( gold_coin_grid('1-8', 1), 0.08 )
 
-    menu_image = love.graphics.newImage('assets/sprites/mainMenuTEMPORARY.png')
-    menu_width = menu_image:getWidth()
-    menu_height = menu_image:getHeight()
-    scaleX = GAME_WIDTH / menu_width
-    scaleY = GAME_HEIGHT / menu_height
-    font = love.graphics.newFont(30)
-    menu_texts = {
-        play = {text = "PLAY", y = 315},
-        level = {text = "SELECT LEVEL", y = 375},
-        quit = {text = "QUIT", y = 435}
-    }
+    -- IMAGES
+    menu_image = love.graphics.newImage('assets/sprites/menu-background.png')
+    settings_image = love.graphics.newImage('assets/sprites/settings.png')
+    level_select_image = love.graphics.newImage('assets/sprites/level-select.png')
+    pause_image = love.graphics.newImage('assets/sprites/pause-screen.png')
+    level_complete_image = love.graphics.newImage('assets/sprites/level-complete.png')
+    star_image = love.graphics.newImage('assets/sprites/star.png')
 
-    music_track = love.audio.newSource("assets/sounds/background_music.wav", "stream")
-    music_track:setVolume(0.1)
-    -- music_track:setPitch(0.8)
-    VOLUME_ENABLED = false
-    volume_image = love.graphics.newImage('assets/sprites/volumeButtons.png')
-    vol_width, vol_height = 176, 178
-    vol_cord_x, vol_cord_y = 400, 600
-    volume_buttons = {}
-    for i = 1, 4 do
-        volume_buttons[i] = love.graphics.newQuad(vol_width * (i - 1), 0, vol_width, vol_height, volume_image:getWidth(), volume_image:getHeight())
+    -- BALLOON IMAGES (MOVE TO ANOTHER FILE)
+    balloon_imgs = {}
+    single_balloons_img = love.graphics.newImage('assets/sprites/single_balloons.png')
+    single_balloon_quads = {}
+    generateQuads(single_balloons_img, 8, single_balloon_quads, 114, 295, 1)
+    for bq in pairs(single_balloon_quads) do
+        table.insert(balloon_imgs, {single_balloons_img, single_balloon_quads[bq]})
     end
-    drawMainMenu()
+    balloon_imgs[9] = love.graphics.newImage('assets/sprites/balloon1.png')
 
-    game_over_image = love.graphics.newImage('assets/sprites/gameOverTemporary.png')
-    game_over_width = game_over_image:getWidth()
-    game_over_height = game_over_image:getHeight()
-    game_over_scaleX = GAME_WIDTH / game_over_width
-    game_over_scaleY = GAME_HEIGHT / game_over_height
-    -- local font = love.graphics.newFont(30)
-    game_over_text = {
-        gameOver = {text = "GAME OVER", y = 100},
-        playAgain = {text = "PLAY AGAIN", y = 620},
-        mainMenu = {text = "MAIN MENU", y = 720},
-    }
+    -- MUSIC
+    music_track = love.audio.newSource("assets/sounds/background_music.wav", "stream")
+    music_track:setVolume(0.05)
+    gold_coin_sfx = love.audio.newSource("assets/sounds/gold-coin.wav", "static")
+    gold_coin_sfx:setVolume(0.3)
+    gold_coin_sfx:setPitch(1.8)
+    level_complete_sfx = love.audio.newSource("assets/sounds/level-complete.wav", "static")
+    level_complete_sfx:setVolume(0.3)
+    button_click_sfx = love.audio.newSource("assets/sounds/button-click.wav", "static")
+    button_click_sfx:setVolume(0.5)
+    button_click_sfx:setPitch(7)
 end
 
-local mousePos = nil
-local timer = 0
-
 function love.update(dt)
+    checkForTimedEvents(dt)
+    -- print(love.mouse.getPosition())
     if (VOLUME_ENABLED) then
         if not music_track:isPlaying( ) then
             love.audio.play(music_track)
         end
     else
-        love.audio.stop()
+        love.audio.stop() -- Disables all sounds (not just music track)
     end
-    -- timer = timer + dt
-    -- if timer >= 1 then
-    --     print(player.x .. " " .. player.y)
-        -- if mousePos ~= love.mouse.getPosition() then
-        --     print(love.mouse.getPosition())
-        --     mousePos = love.mouse.getPosition()
-        -- end
-    --     timer = 0
-    -- end
 
-    if (GAMESTATE == 'MENU_SCREEN') then
-        hoverTextCursor(menu_texts)
+    for bt in pairs(buttons) do -- Sets hover effect to all buttons
+        for index in pairs(buttons[bt]) do
+            buttons[bt][index]:hover()
+        end
+    end
+
+    if (GAMESTATE == 'PAUSED') then
+        player.anim:gotoFrame(2)
+        return
+    end
+
+    if (GAMESTATE == 'LEVEL_COMPLETE') then
+        for b in pairs(balloons) do
+            balloons[b]:update(dt)
+        end
     end
 
     if (GAMESTATE == 'PLAYING_LEVEL') then
         if CURRENT_DIRECTION ~= "" then
+            COMPLETION_TIME = COMPLETION_TIME + dt
+            if not (COIN_EARNED) then
+                checkGoldCoin()
+            end
             checkCollision(CURRENT_DIRECTION)
-            checkFinish()
+            checkFinish(dt)
             playerMove(CURRENT_DIRECTION)
         else
             player.anim:gotoFrame(2)
         end
         sendKeyboardInputs()
+        player.anim:update(dt)
+        gold_coin_anim:update(dt)
+        return
     end
-    player.anim:update(dt)
 end
 
 function love.draw()
-    if (GAMESTATE == 'LEVEL_FINISHED') then -- show gz message, wait 5 seconds, start next level if exists in maps folder
-        gameMap:draw(0, 0, scaleX, scaleY)
-        sendBalloons()
-        -- love.graphics.setColor(0, 0, 0, 100)
-        -- love.graphics.rectangle('fill', 0,0, GAME_WIDTH, GAME_HEIGHT)
-        -- love.graphics.setColor(255,255,255)
-        love.graphics.printf('WELL DONE!', 0, GAME_HEIGHT/2, GAME_WIDTH, 'center', 0, 1.2, 1.2)
-    end
     if (GAMESTATE == 'PLAYING_LEVEL') then
-        gameMap:draw(0, 0, scaleX, scaleY)
+        gameMap:draw(0, 0, SCALE_X, SCALE_Y)
         player.anim:draw(player.spriteSheet, player.x, player.y, 0, 1, 1, PLAYER_WIDTH / 2, PLAYER_HEIGHT / 2)
-    elseif (GAMESTATE == 'MENU_SCREEN') then
-        drawMainMenu()
+        if not (COIN_EARNED) then
+            gold_coin_anim:draw(gold_coin_img, goldCoin.from.x, goldCoin.from.y, 0, 1.2, 1.2, 5, 10)
+        end
+    elseif (GAMESTATE == 'PAUSED') then
+        drawPauseScreen()
+    elseif (GAMESTATE == 'LEVEL_COMPLETE') then
+        drawLevelComplete()
     elseif (GAMESTATE == 'GAME_OVER') then -- show fail screen, try again/mainmenu buttons (with currentLevel)
         drawGameOver()
+    end
+
+    if (GAMESTATE == 'MENU_SCREEN') then
+        drawMainMenu()
+    elseif (GAMESTATE == 'LEVEL_SELECT') then
+        drawLevelSelect()
+    elseif (GAMESTATE == 'SETTINGS') then
+        drawSettings()
     end
 end
 
 function love.mousepressed(x, y, button, istouch)
     if (GAMESTATE == 'MENU_SCREEN') then
         if button == 1 then
-            menuButtons(x, y, button)
-            love.mouse.setCursor()
+            for index in pairs(buttons.menu) do
+                buttons.menu[index]:click()
+            end
         end
     end
+
+    if (GAMESTATE == 'LEVEL_SELECT') then
+        if button == 1 then
+            for index in pairs(buttons.lvlselect) do
+                buttons.lvlselect[index]:click()
+            end
+        end
+    end
+
+    if (GAMESTATE == 'SETTINGS') then
+        if button == 1 then
+            for index in pairs(buttons.settings) do
+                buttons.settings[index]:click()
+            end
+            buttons.lvlselect.back:click()
+        end
+    end
+
+    if (GAMESTATE == 'PAUSED') then
+        if button == 1 then
+            for index in pairs(buttons.pause) do
+                buttons.pause[index]:click()
+            end
+        end
+    end
+
+    if (GAMESTATE == 'LEVEL_COMPLETE') then
+        if button == 1 then
+            for index in pairs(buttons.lvlcomplete) do
+                buttons.lvlcomplete[index]:click()
+            end
+        end
+    end
+    -- love.mouse.setCursor() -- Reset cursor to normal if hovering effect "hand" cursor is enabled
 end
-
--- timePassed = 0
--- timeToPass = 10
--- function love.update(dt)
---  timePassed = timePassed + 1 * dt
-
---  if timePassed > timeToPass then
---   timePassed = 0
---   -- do something here
--- end

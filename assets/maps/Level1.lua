@@ -9,8 +9,8 @@ return {
   height = 30,
   tilewidth = 16,
   tileheight = 16,
-  nextlayerid = 12,
-  nextobjectid = 45,
+  nextlayerid = 14,
+  nextobjectid = 61,
   properties = {},
   tilesets = {
     {
@@ -267,6 +267,35 @@ return {
           shape = "rectangle",
           x = 0,
           y = 336,
+          width = 16,
+          height = 16,
+          rotation = 0,
+          visible = true,
+          properties = {}
+        }
+      }
+    },
+    {
+      type = "objectgroup",
+      draworder = "topdown",
+      id = 12,
+      name = "goldCoin",
+      class = "",
+      visible = false,
+      opacity = 1,
+      offsetx = 0,
+      offsety = 0,
+      parallaxx = 1,
+      parallaxy = 1,
+      properties = {},
+      objects = {
+        {
+          id = 60,
+          name = "",
+          type = "",
+          shape = "rectangle",
+          x = 208,
+          y = 208,
           width = 16,
           height = 16,
           rotation = 0,
