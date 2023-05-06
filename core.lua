@@ -15,10 +15,21 @@ function drawLevelSelect()
 	for index in pairs(buttons.lvlselect) do
 		buttons.lvlselect[index]:draw()
 	end
+
+	for i = 1, #STARS_EARNED do
+		if STARS_EARNED[i] == true then
+			love.graphics.draw(star_small_img, 177 + (85 * (i - 1)), 316, 0, 0.65, 0.65)
+		end
+	end
 end
 
 function drawSettings()
 	love.graphics.draw(settings_image)
+
+    love.graphics.setLineWidth(4)
+    love.graphics.setColor(0.99, 0.26, 0.4)
+	love.graphics.draw(volumeText, 384, 215)
+	volumeSlider:draw()
 
 	for index in pairs(buttons.settings) do
 		buttons.settings[index]:draw()
@@ -45,10 +56,17 @@ function drawLevelComplete()
 	end
 
 	if (COIN_EARNED) then
-		love.graphics.draw(star_image, 340, 330)
+		love.graphics.draw(star_image, 340, 310)
+		STARS_EARNED[currentLevel] = true
 	end
-	time_text = Button:new((string.format("%.2f Seconds", COMPLETION_TIME)), DEFAULT_FONT, nil, nil, nil, 363, 476, 174, 55, nil, nil)
+	
+	local time_text = Button:new((string.format("%.2f Seconds", COMPLETION_TIME)), DEFAULT_FONT, nil, nil, nil, 363, 438, 174, 55, nil, nil)
 	time_text:draw()
+
+	local difficulty_colors = {["EASY"] = {0, 1, 0}, ["MEDIUM"] = {1, 1, 0}, ["HARD"] = {1, 0, 0}}
+	local difficulty_font = love.graphics.newFont('assets/fonts/RussoOne-Regular.ttf', 30)
+	local difficulty_text = Button:new(DIFFICULTY .. " ", difficulty_font, nil, nil, nil, 366, 515, 170, 40, nil, nil, 1, 1, difficulty_colors[DIFFICULTY], nil)
+	difficulty_text:draw()
 
 	for i = 1, #balloons do
 		balloons[i]:draw()
@@ -56,7 +74,13 @@ function drawLevelComplete()
 end
 
 function drawGameOver()
-	print('asd')
+	gameMap:draw(0, 0, SCALE_X, SCALE_Y)
+	player.deadframe:draw(player.spriteSheet, player.x, player.y, 0, 1, 1, PLAYER_WIDTH / 2, PLAYER_HEIGHT / 2)
+	love.graphics.draw(gameover_image)
+
+	for index in pairs(buttons.gameover) do
+		buttons.gameover[index]:draw()
+	end
 end
 
 -- PLAYER INPUTS
@@ -104,26 +128,27 @@ function sendKeyboardInputs()
 			GAMESTATE = 'PLAYING_LEVEL'
 		end
 	end
+	player.deadframe = player.anim.dead
 	return player.anim
 end
 
 -- GAMEPLAY CHECKS
 function checkCollision(dir)
-	for _, v in pairs(wallCollisions) do
+	for _, v in pairs(wallCollisions) do -- Remember player.x / player.y positions is in the center of player
 		if dir == "dir_up" then
-			if (player.y >= (v[2] * SCALE_Y)) and (player.y <= ((v[2] + v[4]) * SCALE_Y) and (player.x >= v[1] * SCALE_X) and (player.x <= ((v[1] + v[3]) * SCALE_X))) then
+			if (player.y - (PLAYER_HEIGHT / 2) >= v[2] * SCALE_Y) and (player.y - (PLAYER_HEIGHT / 2) <= (v[2] + v[4]) * SCALE_Y) and (player.x >= v[1] * SCALE_X) and (player.x <= (v[1] + v[3]) * SCALE_X) then
 				GAMESTATE = 'GAME_OVER'
 			end
 		elseif dir == "dir_left" then
-			if (player.y >= (v[2] * SCALE_Y)) and (player.y <= (v[2] + v[4]) * SCALE_Y) and (player.x >= v[1] * SCALE_X) and (player.x <= (v[1] + v[3]) * SCALE_X) then
+			if (player.y >= v[2] * SCALE_Y) and (player.y <= (v[2] + v[4]) * SCALE_Y) and (player.x - (PLAYER_WIDTH / 2) >= v[1] * SCALE_X) and (player.x - (PLAYER_WIDTH / 2) <= (v[1] + v[3]) * SCALE_X) then
 				GAMESTATE = 'GAME_OVER'
 			end
 		elseif dir == "dir_right" then
-			if (player.y >= (v[2] * SCALE_Y)) and (player.y <= (v[2] + v[4]) * SCALE_Y) and ((player.x + PLAYER_WIDTH) >= v[1] * SCALE_X) and ((player.x + PLAYER_WIDTH) <= (v[1] + v[3]) * SCALE_X) then
+			if (player.y >= v[2] * SCALE_Y) and (player.y <= (v[2] + v[4]) * SCALE_Y) and (player.x + (PLAYER_WIDTH / 2) >= v[1] * SCALE_X) and (player.x + (PLAYER_WIDTH / 2) <= (v[1] + v[3]) * SCALE_X) then
 				GAMESTATE = 'GAME_OVER'
 			end
 		elseif dir == "dir_down" then
-			if ((player.y + PLAYER_HEIGHT) >= (v[2] * SCALE_Y)) and ((player.y + PLAYER_HEIGHT) <= (v[2] + v[4]) * SCALE_Y) and ((player.x + PLAYER_WIDTH) >= v[1] * SCALE_X) and ((player.x + PLAYER_WIDTH) <= (v[1] + v[3]) * SCALE_X) then
+			if (player.y + (PLAYER_HEIGHT / 2) >= v[2] * SCALE_Y) and (player.y + (PLAYER_HEIGHT / 2) <= (v[2] + v[4]) * SCALE_Y) and (player.x >= v[1] * SCALE_X) and (player.x <= (v[1] + v[3]) * SCALE_X) then
 				GAMESTATE = 'GAME_OVER'
 			end
 		end
@@ -191,4 +216,9 @@ function difficultyButton(difficulty, speed)
 		DIFFICULTY = difficulty
 		player.speed = speed
 	end
+end
+
+
+function testBody(dir, lastDir)
+
 end

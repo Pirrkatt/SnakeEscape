@@ -3,11 +3,12 @@ require 'core'
 require 'utilities'
 require 'buttonSetup'
 require 'loadMap'
+require 'libraries/simple-slider'
 
 function love.load()
     anim8 = require 'libraries/anim8'
     sti = require 'libraries/sti'
-    -- love.graphics.setDefaultFilter("nearest", "nearest") -- Disable Blur on scaling
+    love.graphics.setDefaultFilter("nearest", "nearest") -- Disable Blur on scaling
 
     -- PLAYER
     player = {}
@@ -19,11 +20,16 @@ function love.load()
     player.animations.left = anim8.newAnimation( player.grid('1-3', 2), 0.2 )
     player.animations.right = anim8.newAnimation( player.grid('1-3', 3), 0.2 )
     player.animations.up = anim8.newAnimation( player.grid('1-3', 4), 0.2 )
+    player.animations.down.dead = anim8.newAnimation( player.grid('4-4', 1), 0.2 )
+    player.animations.left.dead = anim8.newAnimation( player.grid('4-4', 2), 0.2 )
+    player.animations.right.dead = anim8.newAnimation( player.grid('4-4', 3), 0.2 )
+    player.animations.up.dead = anim8.newAnimation( player.grid('4-4', 4), 0.2 )
 
-    -- player.anim = nil -- Default Direction
+    -- player.anim = player.animations.right -- Default Direction
+    -- player.deadframe = player.anim.dead
 
-    player.speed = 5 -- Default speed = 2 (Medium Difficulty)
-    
+    player.speed = 2 -- Default speed = 2 (Medium Difficulty)
+
     balloons = {} -- Holds all balloon objects (from core.lua CheckFinish)
 
     -- GOLD COIN
@@ -36,8 +42,10 @@ function love.load()
     settings_image = love.graphics.newImage('assets/sprites/settings.png')
     level_select_image = love.graphics.newImage('assets/sprites/level-select.png')
     pause_image = love.graphics.newImage('assets/sprites/pause-screen.png')
-    level_complete_image = love.graphics.newImage('assets/sprites/level-complete.png')
+    gameover_image = love.graphics.newImage('assets/sprites/game-over.png')
+    level_complete_image = love.graphics.newImage('assets/sprites/level-complete2.png')
     star_image = love.graphics.newImage('assets/sprites/star.png')
+    star_small_img = love.graphics.newImage('assets/sprites/star-small.png')
 
     -- BALLOON IMAGES (MOVE TO ANOTHER FILE)
     balloon_imgs = {}
@@ -57,19 +65,34 @@ function love.load()
     gold_coin_sfx:setPitch(1.8)
     level_complete_sfx = love.audio.newSource("assets/sounds/level-complete.wav", "static")
     level_complete_sfx:setVolume(0.3)
+    level_complete_sfx:setPitch(1.2)
     button_click_sfx = love.audio.newSource("assets/sounds/button-click.wav", "static")
     button_click_sfx:setVolume(0.5)
     button_click_sfx:setPitch(7)
+
+    volumePercentage = 0.5
+    love.audio.setVolume(volumePercentage)
+    volumeSlider = newSlider(400, 265, 250, 0.5, 0, 1, function (v) love.audio.setVolume(v) volumePercentage = v end)
 end
+
+-- local timer = 0
 
 function love.update(dt)
     checkForTimedEvents(dt)
-    -- print(love.mouse.getPosition())
+
+    -- timer = timer + dt
+    -- if timer > 1 then
+    --     print(love.mouse.getPosition())
+    --     timer = 0
+    -- end
+
     if (VOLUME_ENABLED) then
+        love.audio.setVolume(volumePercentage)
         if not music_track:isPlaying( ) then
             love.audio.play(music_track)
         end
     else
+        love.audio.setVolume(0)
         love.audio.stop() -- Disables all sounds (not just music track)
     end
 
@@ -77,6 +100,12 @@ function love.update(dt)
         for index in pairs(buttons[bt]) do
             buttons[bt][index]:hover()
         end
+    end
+
+    if (GAMESTATE == 'SETTINGS') then
+        volumeText = love.graphics.newText(DEFAULT_FONT, string.format("%d%%", volumePercentage * 100))
+        volumeSlider:update()
+        return
     end
 
     if (GAMESTATE == 'PAUSED') then
@@ -88,6 +117,7 @@ function love.update(dt)
         for b in pairs(balloons) do
             balloons[b]:update(dt)
         end
+        return
     end
 
     if (GAMESTATE == 'PLAYING_LEVEL') then
@@ -120,7 +150,7 @@ function love.draw()
         drawPauseScreen()
     elseif (GAMESTATE == 'LEVEL_COMPLETE') then
         drawLevelComplete()
-    elseif (GAMESTATE == 'GAME_OVER') then -- show fail screen, try again/mainmenu buttons (with currentLevel)
+    elseif (GAMESTATE == 'GAME_OVER') then
         drawGameOver()
     end
 
@@ -163,6 +193,14 @@ function love.mousepressed(x, y, button, istouch)
         if button == 1 then
             for index in pairs(buttons.pause) do
                 buttons.pause[index]:click()
+            end
+        end
+    end
+
+    if (GAMESTATE == 'GAME_OVER') then
+        if button == 1 then
+            for index in pairs(buttons.gameover) do
+                buttons.gameover[index]:click()
             end
         end
     end

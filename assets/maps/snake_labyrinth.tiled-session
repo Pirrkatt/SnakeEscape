@@ -17,35 +17,59 @@
         },
         "Level1.tmx": {
             "expandedObjectLayers": [
-                12
+                12,
+                8
             ],
             "scale": 1.5,
-            "selectedLayer": 5,
+            "selectedLayer": 4,
             "viewCenter": {
-                "x": 246.33333333333331,
-                "y": 256.66666666666663
+                "x": 240,
+                "y": 239.66666666666663
             }
         },
         "Level1.tmx#tiles": {
             "scaleInDock": 1
         },
         "Level2.tmx": {
+            "expandedObjectLayers": [
+                12,
+                10,
+                9,
+                8
+            ],
             "scale": 1.78125,
-            "selectedLayer": 0,
+            "selectedLayer": 2,
             "viewCenter": {
-                "x": 239.99999999999994,
-                "y": 240.28070175438594
+                "x": 238.31578947368422,
+                "y": 236.91228070175436
             }
         },
         "Level2.tmx#tiles": {
+            "scaleInDock": 1
+        },
+        "Level3.tmx": {
+            "expandedObjectLayers": [
+                10,
+                9,
+                8,
+                7
+            ],
+            "scale": 1.5,
+            "selectedLayer": 8,
+            "viewCenter": {
+                "x": 240,
+                "y": 239.66666666666663
+            }
+        },
+        "Level3.tmx#mainMenu": {
             "scaleInDock": 1
         },
         "mainMenu.tmx": {
             "scale": 1.78125,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 239.43859649122803,
-                "y": 239.1578947368421
+                "x": 239.71929824561403,
+                "y": 239.43859649122805
             }
         },
         "mainMenu.tmx#mainMenu": {
@@ -61,14 +85,16 @@
     "map.tileWidth": 16,
     "map.width": 30,
     "openFiles": [
-        "Level1.tmx",
         "mainMenu.tmx",
-        "Level2.tmx"
+        "Level2.tmx",
+        "Level3.tmx",
+        "Level1.tmx"
     ],
     "project": "snake_labyrinth.tiled-project",
     "recentFiles": [
-        "Level1.tmx",
         "mainMenu.tmx",
+        "Level1.tmx",
+        "Level3.tmx",
         "Level2.tmx"
     ],
     "tileset.embedInMap": true,

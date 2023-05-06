@@ -39,7 +39,7 @@ function loadMap(mapLevel)
         end
     end
 
-    CURRENT_DIRECTION = "dir_" .. gameMap.layers["startPosition"].properties["Direction"]
+    CURRENT_DIRECTION = "" -- "dir_" .. gameMap.layers["startPosition"].properties["Direction"]
     player.anim = player.animations[gameMap.layers["startPosition"].properties["Direction"]]
 
     GAMESTATE = 'PLAYING_LEVEL'

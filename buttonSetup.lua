@@ -8,6 +8,7 @@ buttons.settings = {}
 buttons.lvlselect = {}
 buttons.pause = {}
 buttons.lvlcomplete = {}
+buttons.gameover = {}
 
 -- MENU BUTTONS - LARGE
 local menu_img_large = love.graphics.newImage('assets/sprites/buttons/menu-buttons-large.png')
@@ -66,3 +67,7 @@ buttons.lvlcomplete.home = Button:new("", nil, complete_buttons_img, complete_qu
 buttons.lvlcomplete.lvlselect = Button:new("", nil, complete_buttons_img, complete_quads[2], complete_quads.hover[2], 255 + (73 * 1), 604, 70, 71, function() GAMESTATE = 'LEVEL_SELECT' end, nil)
 buttons.lvlcomplete.restart = Button:new("", nil, complete_buttons_img, complete_quads[3], complete_quads.hover[3], 255 + (73 * 2), 604, 70, 71, restartLevelButton, nil)
 buttons.lvlcomplete.nextlvl = Button:new("", nil, complete_buttons_img, complete_quads[4], complete_quads.hover[4], 255 + (73 * 3), 604, 70, 71, nextLevelButton, nil)
+
+buttons.gameover.home = Button:new("", nil, complete_buttons_img, complete_quads[1], complete_quads.hover[1], 292, 462, 70, 71, function() GAMESTATE = 'MENU_SCREEN' end, nil)
+buttons.gameover.lvlselect = Button:new("", nil, complete_buttons_img, complete_quads[2], complete_quads.hover[2], 292 + (73 * 1), 462, 70, 71, function() GAMESTATE = 'LEVEL_SELECT' end, nil)
+buttons.gameover.restart = Button:new("", nil, complete_buttons_img, complete_quads[3], complete_quads.hover[3], 292 + (73 * 2), 462, 70, 71, restartLevelButton, nil)

@@ -26,3 +26,7 @@ COIN_EARNED = false
 
 -- TABLES
 TIMED_EVENTS = {}
+STARS_EARNED = {}
+for i = 1, 3 do
+    STARS_EARNED[i] = false
+end
