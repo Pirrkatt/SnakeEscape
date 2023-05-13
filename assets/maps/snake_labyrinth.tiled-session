@@ -17,14 +17,14 @@
         },
         "Level1.tmx": {
             "expandedObjectLayers": [
-                12,
-                8
+                8,
+                12
             ],
             "scale": 1.5,
-            "selectedLayer": 4,
+            "selectedLayer": -1,
             "viewCenter": {
-                "x": 240,
-                "y": 239.66666666666663
+                "x": 239.66666666666666,
+                "y": 238.66666666666663
             }
         },
         "Level1.tmx#tiles": {
@@ -32,16 +32,16 @@
         },
         "Level2.tmx": {
             "expandedObjectLayers": [
-                12,
-                10,
                 9,
-                8
+                8,
+                10,
+                12
             ],
-            "scale": 1.78125,
+            "scale": 1.5,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 238.31578947368422,
-                "y": 236.91228070175436
+                "x": 237,
+                "y": 235.33333333333337
             }
         },
         "Level2.tmx#tiles": {
@@ -49,16 +49,16 @@
         },
         "Level3.tmx": {
             "expandedObjectLayers": [
-                10,
                 9,
+                7,
                 8,
-                7
+                10
             ],
             "scale": 1.5,
             "selectedLayer": 8,
             "viewCenter": {
-                "x": 240,
-                "y": 239.66666666666663
+                "x": 239.66666666666666,
+                "y": 238.66666666666663
             }
         },
         "Level3.tmx#mainMenu": {
@@ -85,17 +85,16 @@
     "map.tileWidth": 16,
     "map.width": 30,
     "openFiles": [
-        "mainMenu.tmx",
         "Level2.tmx",
         "Level3.tmx",
         "Level1.tmx"
     ],
     "project": "snake_labyrinth.tiled-project",
     "recentFiles": [
-        "mainMenu.tmx",
         "Level1.tmx",
         "Level3.tmx",
-        "Level2.tmx"
+        "Level2.tmx",
+        "mainMenu.tmx"
     ],
     "tileset.embedInMap": true,
     "tileset.tileSize": {

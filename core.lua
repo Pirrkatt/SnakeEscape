@@ -217,8 +217,3 @@ function difficultyButton(difficulty, speed)
 		player.speed = speed
 	end
 end
-
-
-function testBody(dir, lastDir)
-
-end
