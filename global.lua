@@ -15,7 +15,7 @@ GAMESTATE = 'MENU_SCREEN'
 
 -- MOUSE_HOVERING = false
 
-VOLUME_ENABLED = false -- Change to true so the button generates correct quads (or change button table to start with 3 & 4)
+VOLUME_ENABLED = true -- Change to true so the button generates correct quads (or change button table to start with 3 & 4)
 
 DEFAULT_FONT = love.graphics.newFont('assets/fonts/RussoOne-Regular.ttf', 22)
 
@@ -26,7 +26,8 @@ COIN_EARNED = false
 
 -- TABLES
 TIMED_EVENTS = {}
-STARS_EARNED = {}
+
+STARS_EARNED = {} -- Store Stars Earned for Level Select menu
 for i = 1, 3 do
     STARS_EARNED[i] = false
 end

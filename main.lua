@@ -70,7 +70,7 @@ function love.load()
     button_click_sfx:setVolume(0.5)
     button_click_sfx:setPitch(7)
 
-    volumePercentage = 0.5
+    volumePercentage = 0.5 -- 0.5 = 50%
     love.audio.setVolume(volumePercentage)
     volumeSlider = newSlider(400, 265, 250, 0.5, 0, 1, function (v) love.audio.setVolume(v) volumePercentage = v end)
 end
@@ -141,8 +141,8 @@ end
 
 function love.draw()
     if (GAMESTATE == 'PLAYING_LEVEL') then
-        gameMap:draw(0, 0, SCALE_X, SCALE_Y)
-        player.anim:draw(player.spriteSheet, player.x, player.y, 0, 1, 1, PLAYER_WIDTH / 2, PLAYER_HEIGHT / 2)
+        gameMap:draw(0, 0, SCALE_X, SCALE_Y) -- Draw Level
+        player.anim:draw(player.spriteSheet, player.x, player.y, 0, 1, 1, PLAYER_WIDTH / 2, PLAYER_HEIGHT / 2) -- Draw Player
         if not (COIN_EARNED) then
             gold_coin_anim:draw(gold_coin_img, goldCoin.from.x, goldCoin.from.y, 0, 1.2, 1.2, 5, 10)
         end

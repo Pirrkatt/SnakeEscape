@@ -3,8 +3,4 @@ Add special coins (colored) for unlocking new characters
 
 Save state to local machine - Save settings, stars on each map, maps unlocked, characters unlocked
 Clear saved data button in settings
-
 Rework Gamestates ( Gamestate.menu.menu, Gamestate.menu.lvlselect, Gamestate.menu.settings, Gamestate.playing.play, Gamestate.play.pause, Gamestate.play.win, Gamestate.play.lose)
-Retwork Butons to inherit and make subclasses?
-How to inherit buttons from Button
-How to skip parameters
